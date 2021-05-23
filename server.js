@@ -18,7 +18,13 @@ app.use(express.json());
 
 app.use(express.static('public'));
 
-mongoose.connect(process.env.MOGODB_URI || 'mongodb://localhost/workout', { useNewUrlParser: true });
+mongoose.connect(process.env.MOGODB_URI || 'mongodb://localhost/workout', 
+{ 
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
+  useFindAndModify: false
+});
 
 app.get('/exercise', (req, res) => {
   res.sendFile(path.join(__dirname, './public/exercise.html'));
@@ -38,7 +44,9 @@ app.get('/api/workouts', (req, res) => {
     })
 })
 app.post('/api/workouts', ({ body }, res) => {
-  db.Workout.create(body)
+  db.Workout.create({
+      day: Date.now(),
+    })
     .then(dbWorkout => {
       res.json(dbWorkout);
     })
@@ -71,7 +79,11 @@ app.put('/api/workouts/:id', (req, res) => {
 
 //TODO: need to specify range
 app.get('/api/workouts/range', (req, res) => {
-  db.Workout.find({})
+  db.Workout.find({
+    day: {
+      $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+    }
+  })
   .then(dbWorkout => { 
     res.json(dbWorkout);
   })
