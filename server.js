@@ -50,7 +50,14 @@ app.post('/api/workouts', ({ body }, res) => {
 app.put('/api/workouts/:id', (req, res) => {
   db.Workout.findByIdAndUpdate(
     { _id: req.params.id },
-    { exercises: req.params.body },
+    {$push: { exercises: {
+      type: req.body.type,
+      name: req.body.name,
+      duration: req.body.duration,
+      reps: req.body.reps,
+      sets: req.body.sets,
+      weight: req.body.weight
+    }}},
     function (err, result) {
       if (err) {
         res.send(err);
