@@ -36,7 +36,14 @@ app.get('/stats', (req, res) => {
 });
 
 app.get('/api/workouts', (req, res) => {
-  db.Workout.find({})
+  // db.Workout.find({})
+  db.Workout.aggregate([
+    {
+      $addFields: {
+        totalDuration: {$sum: "$exercises.duration"}
+      }
+  }
+])
     .then(dbWorkout => { 
       res.json(dbWorkout);
     })
@@ -79,7 +86,7 @@ app.put('/api/workouts/:id', (req, res) => {
 });
 
 //TODO: need to specify range
-app.get('/api/workouts/range', (req, res) => {
+/*app.get('/api/workouts/range', (req, res) => {
   db.Workout.find({})
   .then(dbWorkout => {
     const lastSeven = [];
@@ -92,10 +99,32 @@ app.get('/api/workouts/range', (req, res) => {
   .catch(err => {
     console.log(err);
   })
+});*/
+
+app.get('/api/workouts/range', (req, res) => {
+  db.Workout.aggregate([
+    {
+      $addFields: {
+        totalDuration: {$sum: "$exercises.duration"}
+      }
+  }
+])
+  .then(dbWorkout => {
+    const lastSeven = [];
+    for (i = dbWorkout.length - 7; i < dbWorkout.length; i++) {
+    lastSeven.push(dbWorkout[i])
+    }
+    console.log(lastSeven)
+    res.json(lastSeven);
+  
+   })
+  .catch(err => {
+    console.log(err);
+  })
 });
 
 
-//added for commit
+
 app.listen(PORT, () => {
   console.log(`App running on port ${PORT}!`);
 }); 
