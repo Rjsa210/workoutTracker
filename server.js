@@ -80,13 +80,14 @@ app.put('/api/workouts/:id', (req, res) => {
 
 //TODO: need to specify range
 app.get('/api/workouts/range', (req, res) => {
-  db.Workout.find({
-    day: {
-      $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+  db.Workout.find({})
+  .then(dbWorkout => {
+    const lastSeven = [];
+    for (i = dbWorkout.length - 7; i < dbWorkout.length; i++) {
+    lastSeven.push(dbWorkout[i])
     }
-  })
-  .then(dbWorkout => { 
-    res.json(dbWorkout);
+    console.log(lastSeven)
+    res.json(lastSeven);
   })
   .catch(err => {
     console.log(err);
